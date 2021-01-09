@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'debug_toolbar',
+    'store.apps.StoreConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -55,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+
 
 ]
 CORS_ORIGIN_ALLOW_ALL = False
@@ -85,12 +89,7 @@ WSGI_APPLICATION = 'disquaire_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-# DATABASES = {
-# 'default': {
-# 'ENGINE': 'django.db.backends.sqlite3',
-# 'NAME': BASE_DIR / 'db.sqlite3',
-# }
-# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
@@ -125,7 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'fr'
 
-TIME_ZONE = 'UTC+01:00'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
