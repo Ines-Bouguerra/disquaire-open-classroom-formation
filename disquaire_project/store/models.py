@@ -1,9 +1,8 @@
-from django.db import models
 
 # Create your models here.
-# from django.db import models
+from django.db import models
 
-ARTISTS = {
+''' ARTISTS = {
     'francis-cabrel': {'name': 'Francis Cabrel'},
     'lej': {'name': 'Elijay'},
     'rosana': {'name': 'Rosana'},
@@ -16,7 +15,7 @@ ALBUMS = [
     {'name': 'La Dalle', 'artists': [ARTISTS['lej']]},
     {'name': 'Luna Nueva', 'artists': [
         ARTISTS['rosana'], ARTISTS['maria-dolores-pradera']]}
-]
+] '''
 
 
 class Artist(models.Model):
@@ -40,5 +39,5 @@ class Album(models.Model):
 class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     contacted = models.BooleanField(default=False)
-    album = models.OneToOneField(Album)
     contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
+    album = models.OneToOneField(Album, on_delete=models.CASCADE)
