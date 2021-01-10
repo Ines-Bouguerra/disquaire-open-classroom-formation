@@ -1,23 +1,29 @@
 # Create your views here.
 
+from .models import Artist, Contact, Booking, Album
 from django.http import HttpResponse
-#from .models import ALBUMS
 
 
 def index(request):
-    message = "Salut tout le monde !"
+    # request albums
+    albums = Album.objects.filter(available=True).order_by('-created_at')[:12]
+    # then format the request.
+    # note that we don't use album['name'] anymore but album.name
+    # because it's now an attribute.
+    formatted_albums = ["<li>{}</li>".format(album.title) for album in albums]
+    message = """<ul>{}</ul>""".format("\n".join(formatted_albums))
     return HttpResponse(message)
 
 
 def listing(request):
-    albums = ["<li>{}</li>".format(album['name']) for album in ALBUMS]
+    albums = ["<li>{}</li>".format(album['name']) for album in Album]
     message = """<ul>{}</ul>""".format("\n".join(albums))
     return HttpResponse(message)
 
 
 def detail(request, album_id):
     id = int(album_id)  # make sure we have an integer.
-    album = ALBUMS[id]  # get the album with its id.
+    album = Album[id]  # get the album with its id.
     # grab artists name and create a string out of it.
     artists = " ".join([artist['name'] for artist in album['artists']])
     message = "Le nom de l'album est {}. Il a été écrit par {}".format(
@@ -36,7 +42,7 @@ def search(request):
         message = "Aucun artiste n'est demandé"
     else:
         albums = [
-            album for album in ALBUMS
+            album for album in Album
             if query in " ".join(artist['name'] for artist in album['artists'])
         ]
 
