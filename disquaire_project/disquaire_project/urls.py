@@ -19,6 +19,8 @@ from django.conf.urls import include, url
 from django.conf import settings
 
 urlpatterns = [
+    # La méthode url() associe un schéma de route à un ensemble de vue.elle prend en premier paramètre une expression régulière représentant un schéma et en second paramètre la vue à associer
+    url(r'^store/', include('store.urls')),
     path('admin/', admin.site.urls),
 ]
 if settings.DEBUG:
