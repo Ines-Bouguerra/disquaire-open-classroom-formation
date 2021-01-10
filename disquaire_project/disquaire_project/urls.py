@@ -17,9 +17,11 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include, url
 from django.conf import settings
+from store import views
 
 urlpatterns = [
     # La méthode url() associe un schéma de route à un ensemble de vue.elle prend en premier paramètre une expression régulière représentant un schéma et en second paramètre la vue à associer
+    url(r'^$', views.index),
     url(r'^store/', include('store.urls')),
     path('admin/', admin.site.urls),
 ]
