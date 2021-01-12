@@ -2,6 +2,7 @@
 
 from .models import Artist, Contact, Booking, Album
 from django.http import HttpResponse
+from django.template import loader
 
 
 def index(request):
@@ -11,50 +12,43 @@ def index(request):
     # note that we don't use album['name'] anymore but album.name
     # because it's now an attribute.
     formatted_albums = ["<li>{}</li>".format(album.title) for album in albums]
+    template = loader.get_template('store/index.html')
+    return HttpResponse(template.render(request=request))
+
+
+def listing(request):
+    albums = Album.objects.filter(available=True)
+    formatted_albums = ["<li>{}</li>".format(album.title) for album in albums]
     message = """<ul>{}</ul>""".format("\n".join(formatted_albums))
     return HttpResponse(message)
 
 
-def listing(request):
-    albums = ["<li>{}</li>".format(album['name']) for album in Album]
-    message = """<ul>{}</ul>""".format("\n".join(albums))
-    return HttpResponse(message)
-
-
 def detail(request, album_id):
-    id = int(album_id)  # make sure we have an integer.
-    album = Album[id]  # get the album with its id.
-    # grab artists name and create a string out of it.
-    artists = " ".join([artist['name'] for artist in album['artists']])
+    album = Album.objects.get(pk=album_id)
+    artists = " ".join([artist.name for artist in album.artists.all()])
     message = "Le nom de l'album est {}. Il a été écrit par {}".format(
-        album['name'], artists)
+        album.title, artists)
     return HttpResponse(message)
 
 
-# def search(request):
-# obj = str(request.GET)
-#   query = request.GET['query']
-#   message = "propriété GET : {} et requête : {}".format(obj, query)
-#   return HttpResponse(message)
 def search(request):
     query = request.GET.get('query')
     if not query:
-        message = "Aucun artiste n'est demandé"
+        albums = Album.objects.all()
     else:
-        albums = [
-            album for album in Album
-            if query in " ".join(artist['name'] for artist in album['artists'])
-        ]
+        # title contains the query and query is not sensitive to case.
+        albums = Album.objects.filter(title__icontains=query)
 
-        if len(albums) == 0:
-            message = "Misère de misère, nous n'avons trouvé aucun résultat !"
-        else:
-            albums = ["<li>{}</li>".format(album['name']) for album in albums]
-            message = """
-                Nous avons trouvé les albums correspondant à votre requête ! Les voici :
-                <ul>
-                    {}
-                </ul>
-            """.format("</li><li>".join(albums))
+    if not albums.exists():
+        albums = Album.objects.filter(artists__name__icontains=query)
+
+    if not albums.exists():
+        message = "Misère de misère, nous n'avons trouvé aucun résultat !"
+    else:
+        albums = ["<li>{}</li>".format(album.title) for album in albums]
+        message = """
+            Nous avons trouvé les albums correspondant à votre requête ! Les voici :
+            <ul>{}</ul>
+        """.format("</li><li>".join(albums))
 
     return HttpResponse(message)
