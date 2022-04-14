@@ -11,14 +11,14 @@ def index(request):
     # then format the request.
     # note that we don't use album['name'] anymore but album.name
     # because it's now an attribute.
-    formatted_albums = ["<li>{}</li>".format(album.title) for album in albums]
+    formatted_albums = [f"<li>{album.title}</li>" for album in albums]
     template = loader.get_template('store/index.html')
     return HttpResponse(template.render(request=request))
 
 
 def listing(request):
     albums = Album.objects.filter(available=True)
-    formatted_albums = ["<li>{}</li>".format(album.title) for album in albums]
+    formatted_albums = [f"<li>{album.title}</li>" for album in albums]
     message = """<ul>{}</ul>""".format("\n".join(formatted_albums))
     return HttpResponse(message)
 
@@ -26,18 +26,17 @@ def listing(request):
 def detail(request, album_id):
     album = Album.objects.get(pk=album_id)
     artists = " ".join([artist.name for artist in album.artists.all()])
-    message = "Le nom de l'album est {}. Il a été écrit par {}".format(
-        album.title, artists)
+    message = f"Le nom de l'album est {album.title}. Il a été écrit par {artists}"
     return HttpResponse(message)
 
 
 def search(request):
     query = request.GET.get('query')
-    if not query:
-        albums = Album.objects.all()
-    else:
-        # title contains the query and query is not sensitive to case.
-        albums = Album.objects.filter(title__icontains=query)
+    albums = (
+        Album.objects.filter(title__icontains=query)
+        if query
+        else Album.objects.all()
+    )
 
     if not albums.exists():
         albums = Album.objects.filter(artists__name__icontains=query)
@@ -45,7 +44,7 @@ def search(request):
     if not albums.exists():
         message = "Misère de misère, nous n'avons trouvé aucun résultat !"
     else:
-        albums = ["<li>{}</li>".format(album.title) for album in albums]
+        albums = [f"<li>{album.title}</li>" for album in albums]
         message = """
             Nous avons trouvé les albums correspondant à votre requête ! Les voici :
             <ul>{}</ul>
